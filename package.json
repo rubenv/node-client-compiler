@@ -1,0 +1,32 @@
+{
+  "name": "fp-client-compiler",
+  "version": "0.1.0",
+  "description": "Client-side code compiler",
+  "private": "true",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "main": "./lib/index.js",
+  "repository": {
+    "type": "git",
+    "url": "ssh://gitolite@git.flowpilots.com/fp-client-compiler"
+  },
+  "author": "Ruben Vermeersch <ruben@flowpilots.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~0.4.0",
+    "grunt-contrib-coffee": "~0.6.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-watch": "~0.3.1"
+  },
+  "dependencies": {
+    "async": "~0.2.6",
+    "closure-compiler": "git://github.com/rubenv/node-closure.git#master",
+    "coffee-script": "~1.6.1",
+    "fort": "~0.1.0",
+    "jade": "~0.28.2",
+    "jadevu": "0.0.10",
+    "mkdirp": "~0.3.5",
+    "walkdir": "0.0.5"
+  }
+}
