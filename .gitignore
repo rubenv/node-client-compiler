@@ -1,4 +1,4 @@
 .*.swp
-node_modules
-lib
-tmp
+/node_modules
+/lib
+/tmp
