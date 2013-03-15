@@ -5,9 +5,10 @@ coffee = require 'coffee-script'
 walkdir = require 'walkdir'
 fs = require 'fs'
 jade = require 'jade'
-jadevu = require 'jadevu'
 mkdirp = require 'mkdirp'
 path = require 'path'
+
+require 'jadevu'
 
 browser =
     # Require a module.
@@ -53,7 +54,7 @@ class JavaScriptSourceFile extends SourceFile
 
 class CoffeeScriptSourceFile extends JavaScriptSourceFile
     process: (cb) ->
-        @output = coffee.compile(@output, filename: @fileName)
+        @output = coffee.compile(@output, filename: @fileName, bare: true)
         cb(null)
 
 class JadeSourceFile extends SourceFile
@@ -91,17 +92,35 @@ class CompileUnit
 
                 task =
                     exec: (cb) =>
-                        closure.compile src, (err, out) =>
-                            return cb(err) if err
-                            console.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @minFile.replace(@compiler.tmpPath, "tmp/js")
-                            fs.writeFile @minFile, out, cb
+                        @doMinify(src, cb)
 
                 minifier.push task, cb
+
+    doMinify: (src, cb) ->
+        closure.compile src, (err, out) =>
+            return cb(err) if err
+            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @minFile.replace(@compiler.tmpPath, "tmp/js")
+            fs.writeFile @minFile, out, cb
 
 class LibraryCompileUnit extends CompileUnit
     constructor: (@compiler, @name) ->
         @maxFile = path.join @compiler.libPath, "#{@name}.js"
         @minFile = path.join @compiler.tmpPath, "#{@name}.min.js"
+
+    doMinify: (src, cb) ->
+        bundledPath = @maxFile.replace(/\.js$/, ".min.js")
+        fs.exists bundledPath, (exists) =>
+            if exists
+                # Reuse bundled minified file.
+                @compiler.log "  \u001b[90m   copy   : \u001b[0m\u001b[36m%s\u001b[0m", bundledPath.replace(@compiler.libPath, "lib/js")
+                out = fs.createWriteStream(@minFile)
+                out.on 'close', cb
+                fs.createReadStream(bundledPath).pipe(out)
+                return
+
+            # Minify it ourselves.
+            super(src, cb)
+
 
 class SourceDirCompileUnit extends CompileUnit
     constructor: (@compiler) ->
@@ -114,6 +133,7 @@ class SourceDirCompileUnit extends CompileUnit
 
     prepare: (cb) ->
         finder = walkdir(@srcPath)
+        finder.on 'error', (err) -> # Ignore it!
         finder.on 'file', (file) => @queueSourceFile file
         finder.on 'end', (err) =>
             return cb(err) if err
@@ -147,7 +167,7 @@ class SourceDirCompileUnit extends CompileUnit
             if @compiler.options.initWith
                 buf += "require(\"#{@compiler.options.initWith}\");\n"
 
-            console.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @maxFile.replace(@compiler.tmpPath, "tmp/js")
+            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @maxFile.replace(@compiler.tmpPath, "tmp/js")
             fs.writeFile @maxFile, buf, cb
 
 class Compiler
@@ -167,7 +187,7 @@ class Compiler
         ], cb
 
     queueLibraries: (cb) ->
-        for lib in @options.pack
+        for lib in (@options.pack || [])
             @buildQueue.push new LibraryCompileUnit(@, lib)
         cb()
 
@@ -191,7 +211,7 @@ class Compiler
 
         async.forEachSeries @buildQueue, bundleItem, (err) =>
             return cb(err) if err
-            console.log "  \u001b[90m   bundle : \u001b[0m\u001b[36m%s\u001b[0m", out.replace(@outPath, "public/js")
+            @log "  \u001b[90m   bundle : \u001b[0m\u001b[36m%s\u001b[0m", out.replace(@outPath, "public/js")
             fs.writeFile out, sources.join(separator), cb
 
     bundleMax: (cb) -> @bundle('maxFile', @outPath + "/#{@name}.bundle.js", ";\n", cb)
@@ -200,6 +220,10 @@ class Compiler
     minifyQueue: (cb) ->
         minify = (item, cb) -> item.minify(cb)
         async.forEach @buildQueue, minify, cb
+
+    log: () ->
+        if @options.verbose
+            console.log.apply @, arguments
 
     compile: (cb) ->
         async.series [

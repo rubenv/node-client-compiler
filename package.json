@@ -4,28 +4,34 @@
   "description": "Client-side code compiler",
   "private": "true",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "grunt test"
   },
-  "main": "./lib/index.js",
+  "main": "./lib/client-compile.js",
+  "author": {
+    "name": "Ruben Vermeersch",
+    "email": "ruben@savanne.be",
+    "url": "http://savanne.be/"
+  },
   "repository": {
     "type": "git",
     "url": "ssh://gitolite@git.flowpilots.com/fp-client-compiler"
   },
-  "author": "Ruben Vermeersch <ruben@flowpilots.com>",
   "license": "MIT",
   "devDependencies": {
     "grunt": "~0.4.0",
     "grunt-contrib-coffee": "~0.6.0",
     "grunt-contrib-clean": "~0.4.0",
-    "grunt-contrib-watch": "~0.3.1"
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-mocha-cli": "~1.0.1",
+    "grunt-contrib-copy": "~0.4.0"
   },
   "dependencies": {
     "async": "~0.2.6",
     "closure-compiler": "git://github.com/rubenv/node-closure.git#master",
     "coffee-script": "~1.6.1",
     "fort": "~0.1.0",
-    "jade": "~0.28.2",
-    "jadevu": "0.0.10",
+    "jade": "~0.27.7",
+    "jadevu": "git://github.com/rubenv/jadevu.git#master",
     "mkdirp": "~0.3.5",
     "walkdir": "0.0.5"
   }
