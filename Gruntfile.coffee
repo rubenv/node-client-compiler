@@ -4,6 +4,7 @@ module.exports = (grunt) ->
     @loadNpmTasks('grunt-contrib-watch')
     @loadNpmTasks('grunt-contrib-copy')
     @loadNpmTasks('grunt-mocha-cli')
+    @loadNpmTasks('grunt-release')
 
     @initConfig
         coffee:
@@ -41,18 +42,7 @@ module.exports = (grunt) ->
                     slow: 10000
                     timeout: 20000
 
-    @registerTask "npmPack", "Create NPM package.", ->
-        done = @async()
-
-        grunt.util.spawn
-            cmd: "npm"
-            args: ["pack"]
-        , (error, result, code) ->
-            grunt.log.writeln(result.stderr) if result.stderr
-            grunt.log.writeln(result.stdout) if result.stdout
-            done(!error)
-
     @registerTask 'default', ['test']
     @registerTask 'build', ['clean', 'coffee']
-    @registerTask 'package', ['build', 'npmPack']
+    @registerTask 'package', ['build', 'release']
     @registerTask 'test', ['build', 'copy:test', 'mochacli']
