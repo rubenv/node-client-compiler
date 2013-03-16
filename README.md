@@ -2,6 +2,8 @@
  
 Documentation: TODO
 
+[![Build Status](https://travis-ci.org/rubenv/node-client-compiler.png?branch=master)](https://travis-ci.org/rubenv/node-client-compiler)
+
 ## License 
 
     (The MIT License)
