@@ -2,7 +2,7 @@
   "name": "fp-client-compiler",
   "version": "0.1.0",
   "description": "Client-side code compiler",
-  "private": "true",
+  "homepage": "https://github.com/rubenv/node-client-compiler",
   "scripts": {
     "test": "grunt test"
   },
@@ -14,9 +14,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "ssh://gitolite@git.flowpilots.com/fp-client-compiler"
+    "url": "git://github.com/rubenv/node-client-compiler.git"
   },
-  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rubenv/node-client-compiler/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/rubenv/node-client-compiler/blob/master/LICENSE-MIT"
+    }
+  ],
   "devDependencies": {
     "grunt": "~0.4.0",
     "grunt-contrib-coffee": "~0.6.0",
