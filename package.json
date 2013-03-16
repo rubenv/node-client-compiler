@@ -1,6 +1,6 @@
 {
   "name": "fp-client-compiler",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Client-side code compiler",
   "homepage": "https://github.com/rubenv/node-client-compiler",
   "scripts": {
