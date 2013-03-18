@@ -104,7 +104,7 @@ class CompileUnit
     doMinify: (src, cb) ->
         closure.compile src, (err, out) =>
             return cb(err) if err
-            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @minFile.replace(@compiler.tmpPath, "tmp/js")
+            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @minFile.replace(@compiler.tmpPath, @compiler.options.tmpPath)
             fs.writeFile @minFile, out, cb
 
 class LibraryCompileUnit extends CompileUnit
@@ -117,7 +117,7 @@ class LibraryCompileUnit extends CompileUnit
         fs.exists bundledPath, (exists) =>
             if exists
                 # Reuse bundled minified file.
-                @compiler.log "  \u001b[90m   copy   : \u001b[0m\u001b[36m%s\u001b[0m", bundledPath.replace(@compiler.libPath, "lib/js")
+                @compiler.log "  \u001b[90m   copy   : \u001b[0m\u001b[36m%s\u001b[0m", bundledPath.replace(@compiler.libPath, @compiler.options.libPath)
                 out = fs.createWriteStream(@minFile)
                 out.on 'close', cb
                 fs.createReadStream(bundledPath).pipe(out)
@@ -172,18 +172,29 @@ class SourceDirCompileUnit extends CompileUnit
             if @compiler.options.initWith
                 buf += "require(\"#{@compiler.options.initWith}\");\n"
 
-            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @maxFile.replace(@compiler.tmpPath, "tmp/js")
+            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @maxFile.replace(@compiler.tmpPath, @compiler.options.tmpPath)
             fs.writeFile @maxFile, buf, cb
 
 class Compiler
     constructor: (basePath, @name, @options = {}) ->
+        @mergeDefaults
+            path: 'src'
+            libPath: 'lib/js'
+            outPath: 'public/js'
+            tmpPath: 'tmp/js'
+
         @basePath = path.normalize basePath
-        @tmpPath = path.normalize @basePath + "/tmp/js"
-        @outPath = path.normalize @basePath + "/public/js"
-        @libPath = path.normalize @basePath + "/lib/js"
+        @tmpPath = path.normalize @basePath + "/" + @options.tmpPath
+        @outPath = path.normalize @basePath + "/" + @options.outPath
+        @libPath = path.normalize @basePath + "/" + @options.libPath
 
         @stripPrefix = path.join(@basePath, @options.path) + '/'
         @buildQueue = []
+
+    mergeDefaults: (defaults) ->
+        for key, val of defaults
+            if not @options[key]?
+                @options[key] = val
 
     prepareOutput: (cb) ->
         async.parallel [
@@ -216,7 +227,7 @@ class Compiler
 
         async.forEachSeries @buildQueue, bundleItem, (err) =>
             return cb(err) if err
-            @log "  \u001b[90m   bundle : \u001b[0m\u001b[36m%s\u001b[0m", out.replace(@outPath, "public/js")
+            @log "  \u001b[90m   bundle : \u001b[0m\u001b[36m%s\u001b[0m", out.replace(@outPath, @options.outPath)
             fs.writeFile out, sources.join(separator), cb
 
     bundleMax: (cb) -> @bundle('maxFile', @outPath + "/#{@name}.bundle.js", ";\n", cb)
