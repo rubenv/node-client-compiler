@@ -251,8 +251,6 @@ module.exports =
     Compiler: Compiler
     middleware: (basepath, options) ->
         (req, res, next) ->
-            return next() if req.app.settings.env != 'development'
-
             found = false
             for name, opts of options
                 if req.url == "/js/#{name}.bundle.js"
