@@ -54,8 +54,11 @@ class JavaScriptSourceFile extends SourceFile
 
 class CoffeeScriptSourceFile extends JavaScriptSourceFile
     process: (cb) ->
-        @output = coffee.compile(@output, filename: @fileName, bare: true)
-        cb(null)
+        try
+            @output = coffee.compile(@output, filename: @fileName, bare: true)
+            cb(null)
+        catch e
+            cb(e)
 
 class JadeSourceFile extends SourceFile
     process: (cb) ->
