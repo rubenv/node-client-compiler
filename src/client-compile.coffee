@@ -191,10 +191,22 @@ class Compiler
         @stripPrefix = path.join(@basePath, @options.path) + '/'
         @buildQueue = []
 
+        @prepared = false
+
     mergeDefaults: (defaults) ->
         for key, val of defaults
             if not @options[key]?
                 @options[key] = val
+
+    prepare: (cb) ->
+        return cb() if @prepared
+
+        async.series [
+            (cb) => @prepareOutput(cb)
+            (cb) => @queueLibraries(cb)
+            (cb) => @queueSource(cb)
+        ], cb
+
 
     prepareOutput: (cb) ->
         async.parallel [
@@ -243,20 +255,23 @@ class Compiler
 
     compile: (cb) ->
         async.series [
-            (cb) => @prepareOutput(cb)
-            (cb) => @queueLibraries(cb)
-            (cb) => @queueSource(cb)
+            (cb) => @compileBundle(cb)
+            (cb) => @compileMin(cb)
+        ], cb
+
+    compileBundle: (cb) ->
+        async.series [
+            (cb) => @prepare(cb)
             (cb) => @processQueue(cb)
             (cb) => @bundleMax(cb)
-        ], (err) =>
-            return cb(err) if err
-            cb(null) if !@options.wait
+        ], cb
 
-            async.series [
-                (cb) => @minifyQueue(cb)
-                (cb) => @bundleMin(cb)
-            ], (err) =>
-                cb(err) if @options.wait
+    compileMin: (cb) ->
+        async.series [
+            (cb) => @prepare(cb)
+            (cb) => @minifyQueue(cb)
+            (cb) => @bundleMin(cb)
+        ], cb
 
 module.exports =
     Compiler: Compiler

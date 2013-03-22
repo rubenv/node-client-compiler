@@ -9,7 +9,6 @@ describe 'Paths', ->
             tmpPath: 'tmp'
             libPath: 'lib'
             outPath: 'out'
-            wait: true
             pack: [ 'someLibrary', 'secondLibrary' ]
         common.compile 'paths', options, done
 

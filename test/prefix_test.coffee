@@ -7,7 +7,7 @@ describe 'Prefix', ->
         options =
             requirePrefix: 'test/'
             path: 'src'
-        common.compile 'prefix', options, done
+        common.compileBundle 'prefix', options, done
 
     it 'Compiles to a JS file', ->
         assert(fs.existsSync('tmp/prefix/public/js/prefix.bundle.js'))

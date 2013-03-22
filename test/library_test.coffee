@@ -6,7 +6,6 @@ describe 'Library', ->
     before (done) ->
         options =
             path: 'src'
-            wait: true
             pack: [ 'someLibrary', 'secondLibrary' ]
         common.compile 'library', options, done
 

@@ -6,7 +6,7 @@ describe 'Multiple', ->
     before (done) ->
         options =
             path: 'src'
-        common.compile 'multiple', options, done
+        common.compileBundle 'multiple', options, done
 
     it 'Compiles to a JS file', ->
         assert(fs.existsSync('tmp/multiple/public/js/multiple.bundle.js'))

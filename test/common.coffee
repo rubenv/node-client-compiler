@@ -4,11 +4,19 @@ path = require 'path'
 
 clientCompile = require '..'
 
+createCompiler = (name, config) ->
+    basePath = path.join(__dirname, '../tmp/', name)
+    return new clientCompile.Compiler(basePath, name, config)
+
 common = module.exports =
     compile: (name, config, cb) ->
-        basePath = path.join(__dirname, '../tmp/', name)
-        compiler = new clientCompile.Compiler(basePath, name, config)
-        compiler.compile(cb)
+        createCompiler(name, config).compile(cb)
+
+    compileBundle: (name, config, cb) ->
+        createCompiler(name, config).compile(cb)
+
+    compileMin: (name, config, cb) ->
+        createCompiler(name, config).compile(cb)
 
     execute: (name, entry, cb) ->
         common.executePath('tmp/' + name + '/public/js/' + name + '.bundle.js', entry, cb)

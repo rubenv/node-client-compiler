@@ -6,7 +6,6 @@ describe 'Jade', ->
     before (done) ->
         options =
             path: 'src'
-            wait: true
             pack: ['jadevu']
         common.compile 'jade', options, done
 

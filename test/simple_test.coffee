@@ -6,7 +6,6 @@ describe 'Simple', ->
     before (done) ->
         options =
             path: 'src'
-            wait: true
         common.compile 'simple', options, done
 
     it 'Compiles to a JS file', ->
