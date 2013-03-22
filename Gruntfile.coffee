@@ -8,6 +8,8 @@ module.exports = (grunt) ->
 
     @initConfig
         coffee:
+            options:
+                bare: true
             all:
                 expand: true,
                 cwd: 'src',
