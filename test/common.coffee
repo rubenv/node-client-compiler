@@ -25,8 +25,13 @@ common = module.exports =
         common.executePath('tmp/' + name + '/public/js/' + name + '.bundle.min.js', entry, cb)
 
     executePath: (path, entry, cb) ->
+        if !cb
+            cb = entry
+            entry = null
+
         vars = { result: {} }
         context = vm.createContext(vars)
         vm.runInContext(fs.readFileSync(path, 'utf8'), context)
-        vm.runInContext("require('#{entry}');", context)
+        if entry
+            vm.runInContext("require('#{entry}');", context)
         cb(vars)
