@@ -2,7 +2,7 @@ assert = require 'assert'
 common = require './common'
 fs = require 'fs'
 
-describe.only 'Skip Header', ->
+describe 'Skip Header', ->
     before (done) ->
         options =
             path: 'src'
