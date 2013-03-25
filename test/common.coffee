@@ -13,10 +13,10 @@ common = module.exports =
         createCompiler(name, config).compile(cb)
 
     compileBundle: (name, config, cb) ->
-        createCompiler(name, config).compile(cb)
+        createCompiler(name, config).compileBundle(cb)
 
     compileMin: (name, config, cb) ->
-        createCompiler(name, config).compile(cb)
+        createCompiler(name, config).compileMin(cb)
 
     execute: (name, entry, cb) ->
         common.executePath('tmp/' + name + '/public/js/' + name + '.bundle.js', entry, cb)
