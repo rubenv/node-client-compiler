@@ -104,7 +104,7 @@ class CompileUnit
     doMinify: (src, cb) ->
         closure.compile src, (err, out) =>
             return cb(err) if err
-            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @minFile.replace(@compiler.tmpPath, @compiler.options.tmpPath)
+            @compiler.log 'minify', @minFile.replace(@compiler.tmpPath, @compiler.options.tmpPath)
             fs.writeFile @minFile, out, cb
 
 class LibraryCompileUnit extends CompileUnit
@@ -172,7 +172,7 @@ class SourceDirCompileUnit extends CompileUnit
             if @compiler.options.initWith
                 buf += "require(\"#{@compiler.options.initWith}\");\n"
 
-            @compiler.log "  \u001b[90m   create : \u001b[0m\u001b[36m%s\u001b[0m", @maxFile.replace(@compiler.tmpPath, @compiler.options.tmpPath)
+            @compiler.log 'create', @maxFile.replace(@compiler.tmpPath, @compiler.options.tmpPath)
             fs.writeFile @maxFile, buf, cb
 
 class Compiler
@@ -182,6 +182,8 @@ class Compiler
             libPath: 'lib/js'
             outPath: 'public/js'
             tmpPath: 'tmp/js'
+            verbose: false
+            logCb: @defaultLog
 
         @basePath = path.normalize basePath
         @tmpPath = path.normalize @basePath + "/" + @options.tmpPath
@@ -205,7 +207,10 @@ class Compiler
             (cb) => @prepareOutput(cb)
             (cb) => @queueLibraries(cb)
             (cb) => @queueSource(cb)
-        ], cb
+        ], (err) =>
+            return cb(err) if err
+            @prepared = true
+            cb()
 
 
     prepareOutput: (cb) ->
@@ -239,7 +244,7 @@ class Compiler
 
         async.forEachSeries @buildQueue, bundleItem, (err) =>
             return cb(err) if err
-            @log "  \u001b[90m   bundle : \u001b[0m\u001b[36m%s\u001b[0m", out.replace(@outPath, @options.outPath)
+            @log 'bundle', out.replace(@outPath, @options.outPath)
             fs.writeFile out, sources.join(separator), cb
 
     bundleMax: (cb) -> @bundle('maxFile', @outPath + "/#{@name}.bundle.js", ";\n", cb)
@@ -251,7 +256,13 @@ class Compiler
 
     log: () ->
         if @options.verbose
-            console.log.apply @, arguments
+            @options.logCb.apply @, arguments
+
+
+    defaultLog: (verb, message) ->
+        console.log.apply @, arguments
+        verb = ' ' + verb while verb.length < 10
+        console.log "  \u001b[90m #{verb} : \u001b[0m\u001b[36m%s\u001b[0m", message
 
     compile: (cb) ->
         async.series [
