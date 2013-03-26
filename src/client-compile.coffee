@@ -58,8 +58,7 @@ class CoffeeScriptSourceFile extends JavaScriptSourceFile
             @output = coffee.compile(@output, filename: @fileName, bare: true)
             cb(null)
         catch e
-            @compileUnit.compiler.log "  \u001b[31m error in file: #{@fileName}\u001b[0m"
-            @compileUnit.compiler.log e
+            @compileUnit.compiler.log 'error', e
             cb(e)
 
 class JadeSourceFile extends SourceFile
@@ -117,7 +116,7 @@ class LibraryCompileUnit extends CompileUnit
         fs.exists bundledPath, (exists) =>
             if exists
                 # Reuse bundled minified file.
-                @compiler.log "  \u001b[90m   copy   : \u001b[0m\u001b[36m%s\u001b[0m", bundledPath.replace(@compiler.libPath, @compiler.options.libPath)
+                @compiler.log 'copy', bundledPath.replace(@compiler.libPath, @compiler.options.libPath)
                 out = fs.createWriteStream(@minFile)
                 out.on 'close', cb
                 fs.createReadStream(bundledPath).pipe(out)
