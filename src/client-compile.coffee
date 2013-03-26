@@ -258,9 +258,7 @@ class Compiler
         if @options.verbose
             @options.logCb.apply @, arguments
 
-
     defaultLog: (verb, message) ->
-        console.log.apply @, arguments
         verb = ' ' + verb while verb.length < 10
         console.log "  \u001b[90m #{verb} : \u001b[0m\u001b[36m%s\u001b[0m", message
 
