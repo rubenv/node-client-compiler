@@ -23,26 +23,20 @@ describe 'Logging', ->
         assert.equal(messages[0].verb, 'create')
         assert.equal(messages[0].message, 'tmp/js/logging.js')
 
-    assertBundle = (index) ->
-        assert.equal(messages[index].verb, 'bundle')
-        assert.equal(messages[index].message, 'public/js/logging.bundle.js')
+    assertMessage = (verb, message) ->
+        found = false
+        for pair in messages
+            found = true if pair.verb == verb && pair.message == message
+        assert found, "Did not find log message: #{verb}: #{message}"
 
     it 'Logs the main source bundling', ->
-        # Order may flip around
-        assertBundle(if messages[1].verb == 'bundle' then 1 else 2)
-
-    assertMinify = (index) ->
-        assert.equal(messages[index].verb, 'minify')
-        assert.equal(messages[index].message, 'tmp/js/someLibrary.min.js')
+        assertMessage('bundle', 'public/js/logging.bundle.js')
 
     it 'Logs the library minification', ->
-        # Order may flip around
-        assertMinify(if messages[1].verb == 'bundle' then 2 else 1)
+        assertMessage('minify', 'tmp/js/someLibrary.min.js')
 
     it 'Logs the CoffeeScript minification', ->
-        assert.equal(messages[3].verb, 'minify')
-        assert.equal(messages[3].message, 'tmp/js/logging.min.js')
+        assertMessage('minify', 'tmp/js/logging.min.js')
 
     it 'Logs the minified source bundling', ->
-        assert.equal(messages[4].verb, 'bundle')
-        assert.equal(messages[4].message, 'public/js/logging.bundle.min.js')
+        assertMessage('bundle', 'public/js/logging.bundle.min.js')
